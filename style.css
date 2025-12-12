@@ -1,12 +1,15 @@
 :root {
-    --primary-color: #2563eb;
-    --secondary-color: #10b981;
-    --accent-color: #f59e0b;
-    --bg-color: #f3f4f6;
-    --card-bg: #ffffff;
-    --text-dark: #1f2937;
-    --text-light: #6b7280;
-    --border-color: #e5e7eb;
+    /* 3 màu chủ đạo */
+    --primary-color: #f97316;      /* Cam đậm - màu chính */
+    --secondary-color: #1c1917;    /* Nâu đen - nền card */
+    --accent-color: #fbbf24;       /* Vàng - điểm nhấn */
+    
+    /* Màu phụ từ 3 màu chính */
+    --bg-color: #0c0a09;
+    --card-bg: var(--secondary-color);
+    --text-dark: #fafaf9;
+    --text-light: #a8a29e;
+    --border-color: #44403c;
 }
 
 * {
@@ -34,7 +37,8 @@ header {
     background: var(--card-bg);
     padding: 30px 20px;
     border-radius: 15px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    border: 1px solid var(--border-color);
 }
 
 header h1 {
@@ -53,7 +57,8 @@ header h1 {
     padding: 20px;
     border-radius: 15px;
     margin-bottom: 20px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    border: 1px solid var(--border-color);
 }
 
 .mode-selector h3 {
@@ -84,12 +89,14 @@ header h1 {
     border-color: var(--primary-color);
     background: var(--primary-color);
     color: white;
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.5);
 }
 
 .mode-btn.active {
     background: var(--primary-color);
     color: white;
     border-color: var(--primary-color);
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.5);
 }
 
 .stats {
@@ -99,7 +106,8 @@ header h1 {
     padding: 20px;
     border-radius: 15px;
     margin-bottom: 20px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    border: 1px solid var(--border-color);
 }
 
 .stat-item {
@@ -123,7 +131,8 @@ header h1 {
     background: var(--card-bg);
     padding: 30px;
     border-radius: 15px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    border: 1px solid var(--border-color);
 }
 
 .question-number {
@@ -145,7 +154,7 @@ header h1 {
 }
 
 .option {
-    background: var(--bg-color);
+    background: #0c0a09;
     padding: 15px 20px;
     margin-bottom: 12px;
     border-radius: 10px;
@@ -158,8 +167,9 @@ header h1 {
 
 .option:hover {
     border-color: var(--primary-color);
-    background: var(--card-bg);
+    background: #1c1917;
     transform: translateX(5px);
+    box-shadow: 0 0 15px rgba(249, 115, 22, 0.3);
 }
 
 .option.selected {
@@ -169,9 +179,9 @@ header h1 {
 }
 
 .option.correct {
-    background: var(--secondary-color);
+    background: var(--accent-color);
     color: white;
-    border-color: var(--secondary-color);
+    border-color: var(--accent-color);
 }
 
 .option.incorrect {
@@ -195,18 +205,6 @@ header h1 {
     display: flex;
     gap: 10px;
     margin-bottom: 20px;
-    flex-wrap: wrap;
-}
-
-#back-to-mode-btn {
-    margin-left: auto;
-    background: var(--text-light);
-}
-
-#back-to-mode-btn:hover {
-    background: var(--text-dark);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(31, 41, 55, 0.4);
 }
 
 .btn {
@@ -225,31 +223,32 @@ header h1 {
 }
 
 .btn-primary:hover {
-    background: #1d4ed8;
+    background: #ea580c;
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4);
+    box-shadow: 0 5px 15px rgba(249, 115, 22, 0.4);
 }
 
 .btn-secondary {
-    background: var(--secondary-color);
-    color: white;
-}
-
-.btn-secondary:hover {
-    background: #059669;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
-}
-
-.btn-accent {
     background: var(--accent-color);
     color: white;
 }
 
-.btn-accent:hover {
-    background: #d97706;
+.btn-secondary:hover {
+    background: #f59e0b;
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4);
+    box-shadow: 0 5px 15px rgba(251, 191, 36, 0.4);
+}
+
+.btn-accent {
+    background: var(--accent-color);
+    color: #0c0a09;
+    font-weight: 700;
+}
+
+.btn-accent:hover {
+    background: #f59e0b;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(251, 191, 36, 0.4);
 }
 
 .btn:disabled {
@@ -270,14 +269,14 @@ header h1 {
 }
 
 .feedback.correct {
-    background: #d1fae5;
-    color: #065f46;
-    border: 1px solid var(--secondary-color);
+    background: rgba(251, 191, 36, 0.1);
+    color: var(--accent-color);
+    border: 1px solid var(--accent-color);
 }
 
 .feedback.incorrect {
-    background: #fee2e2;
-    color: #991b1b;
+    background: rgba(239, 68, 68, 0.1);
+    color: #fca5a5;
     border: 1px solid #ef4444;
 }
 
@@ -308,7 +307,7 @@ header h1 {
 }
 
 .timer {
-    background: var(--accent-color);
+    background: var(--primary-color);
     color: white;
     padding: 10px 20px;
     border-radius: 10px;

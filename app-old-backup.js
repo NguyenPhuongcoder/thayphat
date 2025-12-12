@@ -6,15 +6,12 @@ let currentMode = 'all';
 let quizQuestions = [];
 let timerInterval = null;
 let timeRemaining = 600; // 10 phút
-let userAnswers = []; // Lưu câu trả lời của user trong chế độ thi
 
 const questionText = document.getElementById('question-text');
 const optionsContainer = document.getElementById('options');
 const submitBtn = document.getElementById('submit-btn');
 const nextBtn = document.getElementById('next-btn');
-const prevBtn = document.getElementById('prev-btn');
 const showAnswerBtn = document.getElementById('show-answer-btn');
-const exitQuizBtn = document.getElementById('exit-quiz-btn');
 const feedback = document.getElementById('feedback');
 const currentQuestionSpan = document.getElementById('current-question');
 const questionNumSpan = document.getElementById('question-num');
@@ -32,30 +29,15 @@ const progressFill = document.getElementById('progress-fill');
 const timerContainer = document.getElementById('timer-container');
 const timerDisplay = document.getElementById('timer');
 const modeInfo = document.getElementById('mode-info');
+const backToExamBtn = document.getElementById('back-to-exam-btn');
+const backToModeBtn = document.getElementById('back-to-mode-btn');
 
 let selectedExam = '1';
-let allQuestions = [];
+let allQuestions = [...questions];
 
 // Khởi tạo
 quizQuestions = [...questionsSet1];
 totalQuestionsSpan.textContent = quizQuestions.length;
-
-// Nút quay lại
-const backToExamBtn = document.getElementById('back-to-exam-btn');
-const backToModeBtn = document.getElementById('back-to-mode-btn');
-
-backToModeBtn.addEventListener('click', () => {
-    modeSelector.style.display = 'none';
-    examSelector.style.display = 'block';
-});
-
-backToExamBtn.addEventListener('click', () => {
-    examSelector.style.display = 'block';
-    modeSelector.style.display = 'none';
-    quizContainer.style.display = 'none';
-    resultContainer.style.display = 'none';
-    if (timerInterval) clearInterval(timerInterval);
-});
 
 // Chọn đề thi
 const examBtns = examSelector.querySelectorAll('.mode-btn');
@@ -66,29 +48,12 @@ examBtns.forEach(btn => {
         selectedExam = btn.dataset.exam;
         
         // Cập nhật câu hỏi theo đề
-        switch(selectedExam) {
-            case '1': allQuestions = [...questionsSet1]; break;
-            case '2': allQuestions = [...questionsSet2]; break;
-            case '3': allQuestions = [...questionsSet3]; break;
-            case '4': allQuestions = [...questionsSet4]; break;
-            case '5': allQuestions = [...questionsSet5]; break;
-            case '6': allQuestions = [...questionsSet6]; break;
-            case '7': allQuestions = [...questionsSet7]; break;
-            case '8': allQuestions = [...questionsSet8]; break;
-            case '9': allQuestions = [...questionsSet9]; break;
-            case '10': allQuestions = [...questionsSet10]; break;
-            case '11': allQuestions = [...questionsSet11]; break;
-            case 'random':
-                // Lấy ngẫu nhiên 40 câu từ đề 3-11
-                const allQuestionsFrom3To11 = [
-                    ...questionsSet3, ...questionsSet4, ...questionsSet5,
-                    ...questionsSet6, ...questionsSet7, ...questionsSet8,
-                    ...questionsSet9, ...questionsSet10, ...questionsSet11
-                ];
-                allQuestions = shuffleArray([...allQuestionsFrom3To11]).slice(0, 40);
-                break;
-            default: 
-                allQuestions = [...questionsSet1];
+        if (selectedExam === '1') {
+            allQuestions = [...questionsSet1];
+        } else if (selectedExam === '2') {
+            allQuestions = [...questionsSet2];
+        } else {
+            allQuestions = [...questionsSet1, ...questionsSet2];
         }
         
         // Hiển thị chọn chế độ học
@@ -113,13 +78,9 @@ function startQuiz() {
     score = 0;
     correctAnswers = 0;
     selectedAnswer = null;
-    userAnswers = []; // Reset câu trả lời
     
     // Chuẩn bị câu hỏi - luôn lấy tất cả câu hỏi của đề đã chọn
     quizQuestions = [...allQuestions];
-    
-    // Khởi tạo mảng lưu câu trả lời
-    userAnswers = new Array(quizQuestions.length).fill(null);
     
     // Thiết lập timer cho chế độ thi
     if (currentMode === 'exam') {
@@ -145,21 +106,7 @@ function startQuiz() {
     correctSpan.textContent = correctAnswers;
     
     // Hiển thị thông tin chế độ
-    const examNames = {
-        '1': 'Đề 1',
-        '2': 'Đề 2',
-        '3': 'Đề 3: Group User',
-        '4': 'Đề 4: Domain & Account',
-        '5': 'Đề 5: FSMO Roles',
-        '6': 'Đề 6: DHCP',
-        '7': 'Đề 7: Trust',
-        '8': 'Đề 8: GPO',
-        '9': 'Đề 9: DNS & RODC',
-        '10': 'Đề 10: Remote Access',
-        '11': 'Đề 11: Định tuyến',
-        'random': '🎲 Đề ngẫu nhiên'
-    };
-    const examName = examNames[selectedExam] || 'Đề thi';
+    const examName = selectedExam === '1' ? 'Đề 1' : selectedExam === '2' ? 'Đề 2' : 'Tất cả';
     const modeName = currentMode === 'learn' ? '🎓 Chế độ Học' : '📝 Chế độ Thi';
     modeInfo.textContent = `${examName} - ${modeName}`;
     
@@ -213,19 +160,11 @@ function loadQuestion() {
     currentQuestionSpan.textContent = currentQuestion + 1;
     
     optionsContainer.innerHTML = '';
-    
-    // Lấy câu trả lời đã chọn trước đó (nếu có)
-    selectedAnswer = userAnswers[currentQuestion];
+    selectedAnswer = null;
     
     question.options.forEach((option, index) => {
         const optionDiv = document.createElement('div');
         optionDiv.className = 'option';
-        
-        // Đánh dấu nếu đã chọn trước đó
-        if (selectedAnswer === index) {
-            optionDiv.classList.add('selected');
-        }
-        
         optionDiv.innerHTML = `
             <span class="option-label">${String.fromCharCode(65 + index)}.</span>
             <span>${option}</span>
@@ -234,49 +173,24 @@ function loadQuestion() {
         optionsContainer.appendChild(optionDiv);
     });
     
-    // Chế độ thi: chỉ hiển thị nút Next/Prev/Submit
-    if (currentMode === 'exam') {
-        submitBtn.style.display = 'none';
-        nextBtn.style.display = 'inline-block';
-        prevBtn.style.display = currentQuestion > 0 ? 'inline-block' : 'none';
-        
-        // Nếu là câu cuối, đổi text thành "Nộp bài"
-        if (currentQuestion === quizQuestions.length - 1) {
-            nextBtn.textContent = '📝 Nộp bài';
-            nextBtn.className = 'btn btn-primary';
-        } else {
-            nextBtn.textContent = 'Câu tiếp theo →';
-            nextBtn.className = 'btn btn-secondary';
-        }
-    } else {
-        // Chế độ học: hiển thị nút kiểm tra
-        submitBtn.style.display = 'inline-block';
-        nextBtn.style.display = 'none';
-        prevBtn.style.display = 'none';
-        submitBtn.disabled = selectedAnswer === null;
-    }
-    
+    submitBtn.style.display = 'inline-block';
+    nextBtn.style.display = 'none';
     feedback.classList.remove('show', 'correct', 'incorrect');
+    submitBtn.disabled = true;
     
     updateProgress();
 }
 
 function selectOption(index, element) {
-    // Trong chế độ thi, cho phép chọn lại
+    if (submitBtn.style.display === 'none') return;
+    
     document.querySelectorAll('.option').forEach(opt => {
         opt.classList.remove('selected');
     });
     
     element.classList.add('selected');
     selectedAnswer = index;
-    
-    // Lưu câu trả lời
-    userAnswers[currentQuestion] = index;
-    
-    // Chỉ enable nút submit trong chế độ học
-    if (currentMode === 'learn') {
-        submitBtn.disabled = false;
-    }
+    submitBtn.disabled = false;
 }
 
 function checkAnswer() {
@@ -325,51 +239,13 @@ function showAnswer() {
 }
 
 function nextQuestion() {
-    // Trong chế độ thi
-    if (currentMode === 'exam') {
-        // Nếu là câu cuối, nộp bài
-        if (currentQuestion === quizQuestions.length - 1) {
-            // Kiểm tra xem đã trả lời hết chưa
-            const unanswered = userAnswers.filter(a => a === null).length;
-            if (unanswered > 0) {
-                if (!confirm(`Bạn còn ${unanswered} câu chưa trả lời. Bạn có chắc muốn nộp bài?`)) {
-                    return;
-                }
-            }
-            gradeExam();
-            return;
-        }
-        
-        // Chuyển câu tiếp theo
-        currentQuestion++;
+    currentQuestion++;
+    
+    if (currentQuestion < quizQuestions.length) {
         loadQuestion();
     } else {
-        // Chế độ học: chuyển câu bình thường
-        currentQuestion++;
-        
-        if (currentQuestion < quizQuestions.length) {
-            loadQuestion();
-        } else {
-            showResults();
-        }
+        showResults();
     }
-}
-
-function gradeExam() {
-    if (timerInterval) clearInterval(timerInterval);
-    
-    // Chấm điểm
-    score = 0;
-    correctAnswers = 0;
-    
-    quizQuestions.forEach((question, index) => {
-        if (userAnswers[index] === question.correct) {
-            score++;
-            correctAnswers++;
-        }
-    });
-    
-    showResults();
 }
 
 function showResults() {
@@ -412,31 +288,39 @@ function restartQuiz() {
     if (timerInterval) clearInterval(timerInterval);
 }
 
-function prevQuestion() {
-    if (currentQuestion > 0) {
-        currentQuestion--;
-        loadQuestion();
-    }
+function backToExamSelection() {
+    modeSelector.style.display = 'none';
+    examSelector.style.display = 'block';
+    
+    // Reset chế độ về mặc định
+    modeBtns.forEach(b => b.classList.remove('active'));
+    modeBtns[0].classList.add('active');
+    currentMode = 'learn';
 }
 
-function exitQuiz() {
-    const confirmExit = confirm('Bạn có chắc muốn thoát? Tiến trình sẽ không được lưu.');
-    if (confirmExit) {
+function backToModeSelection() {
+    if (confirm('Bạn có chắc muốn quay lại? Tiến trình hiện tại sẽ bị mất.')) {
         if (timerInterval) clearInterval(timerInterval);
-        examSelector.style.display = 'block';
-        modeSelector.style.display = 'none';
+        
         quizContainer.style.display = 'none';
-        resultContainer.style.display = 'none';
+        modeSelector.style.display = 'block';
+        
+        // Reset điểm
+        currentQuestion = 0;
+        score = 0;
+        correctAnswers = 0;
+        scoreSpan.textContent = score;
+        correctSpan.textContent = correctAnswers;
     }
 }
 
 // Event listeners
 submitBtn.addEventListener('click', checkAnswer);
 nextBtn.addEventListener('click', nextQuestion);
-prevBtn.addEventListener('click', prevQuestion);
 showAnswerBtn.addEventListener('click', showAnswer);
 restartBtn.addEventListener('click', restartQuiz);
-exitQuizBtn.addEventListener('click', exitQuiz);
+backToExamBtn.addEventListener('click', backToExamSelection);
+backToModeBtn.addEventListener('click', backToModeSelection);
 
 // Bắt đầu với màn hình chọn đề
 examSelector.style.display = 'block';
