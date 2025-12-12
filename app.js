@@ -2,11 +2,16 @@ let currentQuestion = 0;
 let score = 0;
 let correctAnswers = 0;
 let selectedAnswer = null;
+let currentMode = 'all';
+let quizQuestions = [];
+let timerInterval = null;
+let timeRemaining = 600; // 10 phút
 
 const questionText = document.getElementById('question-text');
 const optionsContainer = document.getElementById('options');
 const submitBtn = document.getElementById('submit-btn');
 const nextBtn = document.getElementById('next-btn');
+const showAnswerBtn = document.getElementById('show-answer-btn');
 const feedback = document.getElementById('feedback');
 const currentQuestionSpan = document.getElementById('current-question');
 const questionNumSpan = document.getElementById('question-num');
@@ -18,12 +23,96 @@ const resultContainer = document.getElementById('result-container');
 const finalScoreSpan = document.getElementById('final-score');
 const percentageSpan = document.getElementById('percentage');
 const restartBtn = document.getElementById('restart-btn');
+const modeSelector = document.getElementById('mode-selector');
+const modeBtns = document.querySelectorAll('.mode-btn');
+const progressFill = document.getElementById('progress-fill');
+const timerContainer = document.getElementById('timer-container');
+const timerDisplay = document.getElementById('timer');
 
 // Khởi tạo
-totalQuestionsSpan.textContent = questions.length;
+quizQuestions = [...questions];
+totalQuestionsSpan.textContent = quizQuestions.length;
+
+// Chọn chế độ học
+modeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        modeBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentMode = btn.dataset.mode;
+        startQuiz();
+    });
+});
+
+function startQuiz() {
+    currentQuestion = 0;
+    score = 0;
+    correctAnswers = 0;
+    selectedAnswer = null;
+    
+    // Chuẩn bị câu hỏi theo chế độ
+    if (currentMode === 'random') {
+        quizQuestions = shuffleArray([...questions]).slice(0, 20);
+    } else {
+        quizQuestions = [...questions];
+    }
+    
+    // Thiết lập timer
+    if (currentMode === 'timed') {
+        timeRemaining = 600; // 10 phút
+        timerContainer.style.display = 'block';
+        startTimer();
+    } else {
+        timerContainer.style.display = 'none';
+        if (timerInterval) clearInterval(timerInterval);
+    }
+    
+    // Hiển thị nút xem đáp án cho chế độ luyện tập
+    if (currentMode === 'practice') {
+        showAnswerBtn.style.display = 'inline-block';
+    } else {
+        showAnswerBtn.style.display = 'none';
+    }
+    
+    totalQuestionsSpan.textContent = quizQuestions.length;
+    scoreSpan.textContent = score;
+    correctSpan.textContent = correctAnswers;
+    
+    modeSelector.style.display = 'none';
+    quizContainer.style.display = 'block';
+    resultContainer.style.display = 'none';
+    
+    loadQuestion();
+}
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+function startTimer() {
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        const minutes = Math.floor(timeRemaining / 60);
+        const seconds = timeRemaining % 60;
+        timerDisplay.textContent = `⏱️ ${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            showResults();
+        }
+    }, 1000);
+}
+
+function updateProgress() {
+    const progress = ((currentQuestion + 1) / quizQuestions.length) * 100;
+    progressFill.style.width = progress + '%';
+}
 
 function loadQuestion() {
-    const question = questions[currentQuestion];
+    const question = quizQuestions[currentQuestion];
     questionText.textContent = question.question;
     questionNumSpan.textContent = currentQuestion + 1;
     currentQuestionSpan.textContent = currentQuestion + 1;
@@ -46,6 +135,8 @@ function loadQuestion() {
     nextBtn.style.display = 'none';
     feedback.classList.remove('show', 'correct', 'incorrect');
     submitBtn.disabled = true;
+    
+    updateProgress();
 }
 
 function selectOption(index, element) {
@@ -63,7 +154,7 @@ function selectOption(index, element) {
 function checkAnswer() {
     if (selectedAnswer === null) return;
     
-    const question = questions[currentQuestion];
+    const question = quizQuestions[currentQuestion];
     const options = document.querySelectorAll('.option');
     
     options.forEach(opt => {
@@ -89,10 +180,26 @@ function checkAnswer() {
     nextBtn.style.display = 'inline-block';
 }
 
+function showAnswer() {
+    const question = quizQuestions[currentQuestion];
+    const options = document.querySelectorAll('.option');
+    
+    options.forEach(opt => {
+        opt.classList.add('disabled');
+    });
+    
+    options[question.correct].classList.add('correct');
+    feedback.textContent = `💡 Đáp án đúng là: ${String.fromCharCode(65 + question.correct)}. ${question.options[question.correct]}`;
+    feedback.classList.add('show', 'correct');
+    
+    submitBtn.style.display = 'none';
+    nextBtn.style.display = 'inline-block';
+}
+
 function nextQuestion() {
     currentQuestion++;
     
-    if (currentQuestion < questions.length) {
+    if (currentQuestion < quizQuestions.length) {
         loadQuestion();
     } else {
         showResults();
@@ -100,33 +207,30 @@ function nextQuestion() {
 }
 
 function showResults() {
+    if (timerInterval) clearInterval(timerInterval);
+    
     quizContainer.style.display = 'none';
     resultContainer.style.display = 'block';
     
     finalScoreSpan.textContent = score;
-    const percentage = Math.round((score / questions.length) * 100);
+    const percentage = Math.round((score / quizQuestions.length) * 100);
     percentageSpan.textContent = percentage;
 }
 
 function restartQuiz() {
-    currentQuestion = 0;
-    score = 0;
-    correctAnswers = 0;
-    selectedAnswer = null;
-    
-    scoreSpan.textContent = score;
-    correctSpan.textContent = correctAnswers;
-    
-    quizContainer.style.display = 'block';
+    modeSelector.style.display = 'block';
+    quizContainer.style.display = 'none';
     resultContainer.style.display = 'none';
     
-    loadQuestion();
+    if (timerInterval) clearInterval(timerInterval);
 }
 
 // Event listeners
 submitBtn.addEventListener('click', checkAnswer);
 nextBtn.addEventListener('click', nextQuestion);
+showAnswerBtn.addEventListener('click', showAnswer);
 restartBtn.addEventListener('click', restartQuiz);
 
-// Load câu hỏi đầu tiên
-loadQuestion();
+// Bắt đầu với chế độ mặc định
+modeSelector.style.display = 'block';
+quizContainer.style.display = 'none';
