@@ -64,12 +64,12 @@ header h1 {
 
 .mode-buttons {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
 }
 
 .mode-btn {
-    padding: 12px 20px;
+    padding: 15px 25px;
     border: 2px solid var(--border-color);
     background: var(--card-bg);
     border-radius: 10px;
@@ -77,6 +77,7 @@ header h1 {
     transition: all 0.3s ease;
     font-weight: 600;
     color: var(--text-dark);
+    font-size: 1rem;
 }
 
 .mode-btn:hover {
@@ -194,6 +195,18 @@ header h1 {
     display: flex;
     gap: 10px;
     margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+#back-to-mode-btn {
+    margin-left: auto;
+    background: var(--text-light);
+}
+
+#back-to-mode-btn:hover {
+    background: var(--text-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(31, 41, 55, 0.4);
 }
 
 .btn {

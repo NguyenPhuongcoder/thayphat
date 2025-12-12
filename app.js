@@ -23,17 +23,47 @@ const resultContainer = document.getElementById('result-container');
 const finalScoreSpan = document.getElementById('final-score');
 const percentageSpan = document.getElementById('percentage');
 const restartBtn = document.getElementById('restart-btn');
+const examSelector = document.getElementById('exam-selector');
 const modeSelector = document.getElementById('mode-selector');
-const modeBtns = document.querySelectorAll('.mode-btn');
 const progressFill = document.getElementById('progress-fill');
 const timerContainer = document.getElementById('timer-container');
 const timerDisplay = document.getElementById('timer');
+const modeInfo = document.getElementById('mode-info');
+const backToExamBtn = document.getElementById('back-to-exam-btn');
+const backToModeBtn = document.getElementById('back-to-mode-btn');
+
+let selectedExam = '1';
+let allQuestions = [...questions];
 
 // Khởi tạo
-quizQuestions = [...questions];
+quizQuestions = [...questionsSet1];
 totalQuestionsSpan.textContent = quizQuestions.length;
 
+// Chọn đề thi
+const examBtns = examSelector.querySelectorAll('.mode-btn');
+examBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        examBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedExam = btn.dataset.exam;
+        
+        // Cập nhật câu hỏi theo đề
+        if (selectedExam === '1') {
+            allQuestions = [...questionsSet1];
+        } else if (selectedExam === '2') {
+            allQuestions = [...questionsSet2];
+        } else {
+            allQuestions = [...questionsSet1, ...questionsSet2];
+        }
+        
+        // Hiển thị chọn chế độ học
+        examSelector.style.display = 'none';
+        modeSelector.style.display = 'block';
+    });
+});
+
 // Chọn chế độ học
+const modeBtns = modeSelector.querySelectorAll('.mode-btn');
 modeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         modeBtns.forEach(b => b.classList.remove('active'));
@@ -49,16 +79,14 @@ function startQuiz() {
     correctAnswers = 0;
     selectedAnswer = null;
     
-    // Chuẩn bị câu hỏi theo chế độ
-    if (currentMode === 'random') {
-        quizQuestions = shuffleArray([...questions]).slice(0, 20);
-    } else {
-        quizQuestions = [...questions];
-    }
+    // Chuẩn bị câu hỏi - luôn lấy tất cả câu hỏi của đề đã chọn
+    quizQuestions = [...allQuestions];
     
-    // Thiết lập timer
-    if (currentMode === 'timed') {
-        timeRemaining = 600; // 10 phút
+    // Thiết lập timer cho chế độ thi
+    if (currentMode === 'exam') {
+        // Tính thời gian: 40 câu = 30 phút, 80 câu = 60 phút
+        const timeInMinutes = quizQuestions.length === 40 ? 30 : 60;
+        timeRemaining = timeInMinutes * 60;
         timerContainer.style.display = 'block';
         startTimer();
     } else {
@@ -66,8 +94,8 @@ function startQuiz() {
         if (timerInterval) clearInterval(timerInterval);
     }
     
-    // Hiển thị nút xem đáp án cho chế độ luyện tập
-    if (currentMode === 'practice') {
+    // Hiển thị nút xem đáp án cho chế độ học
+    if (currentMode === 'learn') {
         showAnswerBtn.style.display = 'inline-block';
     } else {
         showAnswerBtn.style.display = 'none';
@@ -76,6 +104,14 @@ function startQuiz() {
     totalQuestionsSpan.textContent = quizQuestions.length;
     scoreSpan.textContent = score;
     correctSpan.textContent = correctAnswers;
+    
+    // Hiển thị thông tin chế độ
+    const examName = selectedExam === '1' ? 'Đề 1' : selectedExam === '2' ? 'Đề 2' : 'Tất cả';
+    const modeName = currentMode === 'learn' ? '🎓 Chế độ Học' : '📝 Chế độ Thi';
+    modeInfo.textContent = `${examName} - ${modeName}`;
+    
+    // Reset màu timer
+    timerDisplay.style.background = 'var(--accent-color)';
     
     modeSelector.style.display = 'none';
     quizContainer.style.display = 'block';
@@ -99,8 +135,14 @@ function startTimer() {
         const seconds = timeRemaining % 60;
         timerDisplay.textContent = `⏱️ ${minutes}:${seconds.toString().padStart(2, '0')}`;
         
+        // Đổi màu khi còn 5 phút
+        if (timeRemaining <= 300) {
+            timerDisplay.style.background = '#ef4444';
+        }
+        
         if (timeRemaining <= 0) {
             clearInterval(timerInterval);
+            alert('⏰ Hết giờ! Bài thi kết thúc.');
             showResults();
         }
     }, 1000);
@@ -215,14 +257,61 @@ function showResults() {
     finalScoreSpan.textContent = score;
     const percentage = Math.round((score / quizQuestions.length) * 100);
     percentageSpan.textContent = percentage;
+    
+    // Cập nhật thông báo kết quả
+    const resultTitle = document.querySelector('.result-card h2');
+    if (currentMode === 'exam') {
+        if (percentage >= 80) {
+            resultTitle.textContent = '🎉 Xuất sắc! Đạt yêu cầu!';
+        } else if (percentage >= 50) {
+            resultTitle.textContent = '👍 Khá tốt! Cần cố gắng thêm!';
+        } else {
+            resultTitle.textContent = '💪 Cần ôn tập thêm!';
+        }
+    } else {
+        resultTitle.textContent = '✅ Hoàn thành bài học!';
+    }
 }
 
 function restartQuiz() {
-    modeSelector.style.display = 'block';
+    examSelector.style.display = 'block';
+    modeSelector.style.display = 'none';
     quizContainer.style.display = 'none';
     resultContainer.style.display = 'none';
     
+    // Reset về đề 1
+    examBtns.forEach(b => b.classList.remove('active'));
+    examBtns[0].classList.add('active');
+    selectedExam = '1';
+    allQuestions = [...questionsSet1];
+    
     if (timerInterval) clearInterval(timerInterval);
+}
+
+function backToExamSelection() {
+    modeSelector.style.display = 'none';
+    examSelector.style.display = 'block';
+    
+    // Reset chế độ về mặc định
+    modeBtns.forEach(b => b.classList.remove('active'));
+    modeBtns[0].classList.add('active');
+    currentMode = 'learn';
+}
+
+function backToModeSelection() {
+    if (confirm('Bạn có chắc muốn quay lại? Tiến trình hiện tại sẽ bị mất.')) {
+        if (timerInterval) clearInterval(timerInterval);
+        
+        quizContainer.style.display = 'none';
+        modeSelector.style.display = 'block';
+        
+        // Reset điểm
+        currentQuestion = 0;
+        score = 0;
+        correctAnswers = 0;
+        scoreSpan.textContent = score;
+        correctSpan.textContent = correctAnswers;
+    }
 }
 
 // Event listeners
@@ -230,7 +319,10 @@ submitBtn.addEventListener('click', checkAnswer);
 nextBtn.addEventListener('click', nextQuestion);
 showAnswerBtn.addEventListener('click', showAnswer);
 restartBtn.addEventListener('click', restartQuiz);
+backToExamBtn.addEventListener('click', backToExamSelection);
+backToModeBtn.addEventListener('click', backToModeSelection);
 
-// Bắt đầu với chế độ mặc định
-modeSelector.style.display = 'block';
+// Bắt đầu với màn hình chọn đề
+examSelector.style.display = 'block';
+modeSelector.style.display = 'none';
 quizContainer.style.display = 'none';
