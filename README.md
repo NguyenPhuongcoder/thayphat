@@ -4,7 +4,7 @@ Web app học tập trắc nghiệm tương tác về Windows Server và Mạng 
 
 ## Tính năng
 
-- ✅ 40 câu hỏi trắc nghiệm về Windows Server, Active Directory, DNS, DHCP, OSPF, RIP, VPN
+- ✅ 80 câu hỏi trắc nghiệm về Windows Server, Active Directory, DNS, DHCP, OSPF, RIP, VPN, NTFS, ReFS, RAID
 - ✅ Giao diện đẹp, responsive
 - ✅ Hiển thị kết quả ngay lập tức
 - ✅ Thống kê điểm số và tỷ lệ đúng
