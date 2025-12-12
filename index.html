@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ôn Tập Windows Server & Networking</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎓 Ôn Tập Windows Server & Networking</h1>
+            <p class="subtitle">Hệ thống học tập trắc nghiệm tương tác</p>
+        </header>
+
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-label">Câu hỏi:</span>
+                <span id="current-question">1</span>/<span id="total-questions">40</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Điểm:</span>
+                <span id="score">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Đúng:</span>
+                <span id="correct">0</span>
+            </div>
+        </div>
+
+        <div id="quiz-container">
+            <div class="question-card">
+                <h2 class="question-number">Câu <span id="question-num">1</span></h2>
+                <p class="question-text" id="question-text"></p>
+                <div class="options" id="options"></div>
+                <div class="button-group">
+                    <button id="submit-btn" class="btn btn-primary">Kiểm tra</button>
+                    <button id="next-btn" class="btn btn-secondary" style="display: none;">Câu tiếp theo</button>
+                </div>
+                <div id="feedback" class="feedback"></div>
+            </div>
+        </div>
+
+        <div id="result-container" style="display: none;">
+            <div class="result-card">
+                <h2>🎉 Hoàn thành!</h2>
+                <div class="result-stats">
+                    <p class="result-score">Điểm số: <span id="final-score">0</span>/40</p>
+                    <p class="result-percentage">Tỷ lệ đúng: <span id="percentage">0</span>%</p>
+                </div>
+                <button id="restart-btn" class="btn btn-primary">Làm lại</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="questions.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
