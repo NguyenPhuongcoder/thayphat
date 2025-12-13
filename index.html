@@ -105,6 +105,29 @@
                     <h2 style="margin: 0;">📋 Xem lại đáp án</h2>
                     <button id="back-to-result-btn" class="btn btn-secondary" style="padding: 8px 16px;">← Quay lại</button>
                 </div>
+                
+                <div class="review-stats">
+                    <div class="review-stat-item correct">
+                        <span class="review-stat-label">✓ Câu đúng:</span>
+                        <span class="review-stat-value" id="review-correct-count">0</span>
+                    </div>
+                    <div class="review-stat-item incorrect">
+                        <span class="review-stat-label">✗ Câu sai:</span>
+                        <span class="review-stat-value" id="review-incorrect-count">0</span>
+                    </div>
+                    <div class="review-stat-item unanswered">
+                        <span class="review-stat-label">○ Chưa trả lời:</span>
+                        <span class="review-stat-value" id="review-unanswered-count">0</span>
+                    </div>
+                </div>
+
+                <div class="review-filter">
+                    <button class="filter-btn active" data-filter="all">Tất cả</button>
+                    <button class="filter-btn" data-filter="correct">Chỉ câu đúng</button>
+                    <button class="filter-btn" data-filter="incorrect">Chỉ câu sai</button>
+                    <button class="filter-btn" data-filter="unanswered">Chưa trả lời</button>
+                </div>
+
                 <div id="review-content"></div>
                 <div style="text-align: center; margin-top: 20px;">
                     <button id="restart-from-review-btn" class="btn btn-primary">Làm lại</button>

@@ -32,7 +32,6 @@ const progressFill = document.getElementById('progress-fill');
 const timerContainer = document.getElementById('timer-container');
 const timerDisplay = document.getElementById('timer');
 const modeInfo = document.getElementById('mode-info');
-const exitQuizBtn = document.getElementById('exit-quiz-btn');
 const reviewBtn = document.getElementById('review-btn');
 const reviewContainer = document.getElementById('review-container');
 const reviewContent = document.getElementById('review-content');
@@ -440,16 +439,41 @@ function showReview() {
     resultContainer.style.display = 'none';
     reviewContainer.style.display = 'block';
     
+    // Tính toán thống kê
+    let correctCount = 0;
+    let incorrectCount = 0;
+    let unansweredCount = 0;
+    
+    quizQuestions.forEach((question, index) => {
+        const userAnswer = userAnswers[index];
+        if (userAnswer === null) {
+            unansweredCount++;
+        } else if (userAnswer === question.correct) {
+            correctCount++;
+        } else {
+            incorrectCount++;
+        }
+    });
+    
+    // Cập nhật thống kê
+    document.getElementById('review-correct-count').textContent = correctCount;
+    document.getElementById('review-incorrect-count').textContent = incorrectCount;
+    document.getElementById('review-unanswered-count').textContent = unansweredCount;
+    
     let reviewHTML = '';
     
     quizQuestions.forEach((question, index) => {
         const userAnswer = userAnswers[index];
         const isCorrect = userAnswer === question.correct;
+        const isUnanswered = userAnswer === null;
+        
+        let statusClass = isUnanswered ? 'unanswered' : (isCorrect ? 'correct' : 'incorrect');
+        let statusText = isUnanswered ? '○ Chưa trả lời' : (isCorrect ? '✓ Đúng' : '✗ Sai');
         
         reviewHTML += `
-            <div class="review-item ${isCorrect ? 'correct' : 'incorrect'}">
-                <span class="review-status ${isCorrect ? 'correct' : 'incorrect'}">
-                    ${isCorrect ? '✓ Đúng' : '✗ Sai'}
+            <div class="review-item ${statusClass}" data-status="${statusClass}">
+                <span class="review-status ${statusClass}">
+                    ${statusText}
                 </span>
                 <div class="review-question">
                     Câu ${index + 1}: ${question.question}
@@ -471,8 +495,8 @@ function showReview() {
             `;
         }
         
-        // Nếu sai, hiển thị đáp án đúng
-        if (!isCorrect) {
+        // Nếu sai hoặc chưa trả lời, hiển thị đáp án đúng
+        if (!isCorrect || isUnanswered) {
             reviewHTML += `
                 <div class="review-answer correct-answer">
                     <strong>Đáp án đúng:</strong> ${String.fromCharCode(65 + question.correct)}. ${question.options[question.correct]}
@@ -484,6 +508,36 @@ function showReview() {
     });
     
     reviewContent.innerHTML = reviewHTML;
+    
+    // Setup filter buttons
+    setupFilterButtons();
+}
+
+function setupFilterButtons() {
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Remove active class from all buttons
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            const filter = btn.dataset.filter;
+            const reviewItems = document.querySelectorAll('.review-item');
+            
+            reviewItems.forEach(item => {
+                if (filter === 'all') {
+                    item.classList.remove('hidden');
+                } else {
+                    if (item.dataset.status === filter) {
+                        item.classList.remove('hidden');
+                    } else {
+                        item.classList.add('hidden');
+                    }
+                }
+            });
+        });
+    });
 }
 
 function backToResult() {
