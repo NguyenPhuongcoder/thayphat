@@ -32,6 +32,12 @@ const progressFill = document.getElementById('progress-fill');
 const timerContainer = document.getElementById('timer-container');
 const timerDisplay = document.getElementById('timer');
 const modeInfo = document.getElementById('mode-info');
+const exitQuizBtn = document.getElementById('exit-quiz-btn');
+const reviewBtn = document.getElementById('review-btn');
+const reviewContainer = document.getElementById('review-container');
+const reviewContent = document.getElementById('review-content');
+const backToResultBtn = document.getElementById('back-to-result-btn');
+const restartFromReviewBtn = document.getElementById('restart-from-review-btn');
 
 let selectedExam = '1';
 let allQuestions = [];
@@ -430,6 +436,61 @@ function exitQuiz() {
     }
 }
 
+function showReview() {
+    resultContainer.style.display = 'none';
+    reviewContainer.style.display = 'block';
+    
+    let reviewHTML = '';
+    
+    quizQuestions.forEach((question, index) => {
+        const userAnswer = userAnswers[index];
+        const isCorrect = userAnswer === question.correct;
+        
+        reviewHTML += `
+            <div class="review-item ${isCorrect ? 'correct' : 'incorrect'}">
+                <span class="review-status ${isCorrect ? 'correct' : 'incorrect'}">
+                    ${isCorrect ? '✓ Đúng' : '✗ Sai'}
+                </span>
+                <div class="review-question">
+                    Câu ${index + 1}: ${question.question}
+                </div>
+        `;
+        
+        // Hiển thị câu trả lời của user
+        if (userAnswer !== null) {
+            reviewHTML += `
+                <div class="review-answer ${isCorrect ? 'correct-answer' : 'wrong-answer'}">
+                    <strong>Bạn chọn:</strong> ${String.fromCharCode(65 + userAnswer)}. ${question.options[userAnswer]}
+                </div>
+            `;
+        } else {
+            reviewHTML += `
+                <div class="review-answer wrong-answer">
+                    <strong>Bạn chọn:</strong> Chưa trả lời
+                </div>
+            `;
+        }
+        
+        // Nếu sai, hiển thị đáp án đúng
+        if (!isCorrect) {
+            reviewHTML += `
+                <div class="review-answer correct-answer">
+                    <strong>Đáp án đúng:</strong> ${String.fromCharCode(65 + question.correct)}. ${question.options[question.correct]}
+                </div>
+            `;
+        }
+        
+        reviewHTML += `</div>`;
+    });
+    
+    reviewContent.innerHTML = reviewHTML;
+}
+
+function backToResult() {
+    reviewContainer.style.display = 'none';
+    resultContainer.style.display = 'block';
+}
+
 // Event listeners
 submitBtn.addEventListener('click', checkAnswer);
 nextBtn.addEventListener('click', nextQuestion);
@@ -437,6 +498,9 @@ prevBtn.addEventListener('click', prevQuestion);
 showAnswerBtn.addEventListener('click', showAnswer);
 restartBtn.addEventListener('click', restartQuiz);
 exitQuizBtn.addEventListener('click', exitQuiz);
+reviewBtn.addEventListener('click', showReview);
+backToResultBtn.addEventListener('click', backToResult);
+restartFromReviewBtn.addEventListener('click', restartQuiz);
 
 // Bắt đầu với màn hình chọn đề
 examSelector.style.display = 'block';

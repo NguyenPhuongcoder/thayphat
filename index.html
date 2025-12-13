@@ -92,7 +92,23 @@
                     <p class="result-score">Điểm số: <span id="final-score">0</span>/40</p>
                     <p class="result-percentage">Tỷ lệ đúng: <span id="percentage">0</span>%</p>
                 </div>
-                <button id="restart-btn" class="btn btn-primary">Làm lại</button>
+                <div class="button-group" style="justify-content: center;">
+                    <button id="review-btn" class="btn btn-secondary">📋 Xem chi tiết</button>
+                    <button id="restart-btn" class="btn btn-primary">Làm lại</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="review-container" style="display: none;">
+            <div class="result-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin: 0;">📋 Xem lại đáp án</h2>
+                    <button id="back-to-result-btn" class="btn btn-secondary" style="padding: 8px 16px;">← Quay lại</button>
+                </div>
+                <div id="review-content"></div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button id="restart-from-review-btn" class="btn btn-primary">Làm lại</button>
+                </div>
             </div>
         </div>
     </div>
